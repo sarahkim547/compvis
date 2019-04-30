@@ -24,7 +24,7 @@ def normalizeImage(image):
     """
     return (image.astype(float) - 128) / 128
 
-def extractPatches(im, mask):
+def extractPatches(im, mask, patch_num):
     # patches = extract_patches_2d(im, (51,51)) 
     # pad = int((51 - 1)/2)
     # h, w = mask.shape
@@ -38,15 +38,23 @@ def extractPatches(im, mask):
     labels = mask[pad:h-pad, pad:w-pad]
     labels = labels.flatten()
 
-    patches = np.zeros((len(labels), wSz, wSz, 3))
+    # patches = np.zeros((len(labels), wSz, wSz, 3))
 
-    count = 0
+    # count = 0
+    # for i in range(pad, h - pad, 2):
+    #     for j in range(pad, w - pad, 2):
+    #         curr_patch = im[i-pad:i+pad+1, j-pad:j+pad+1, :]
+    #         patches[count] = curr_patch
+    #         count += 1
+    # return patches, labels
+
     for i in range(pad, h - pad, 2):
         for j in range(pad, w - pad, 2):
             curr_patch = im[i-pad:i+pad+1, j-pad:j+pad+1, :]
-            patches[count] = curr_patch
-            count += 1
-    return patches, labels
+            done = save_image('patches/' + str(patch_num) + '.png', curr_patch)
+            patch_num += 1
+    return patches, labels, patch_num
+
 
 
 def main():
@@ -57,10 +65,15 @@ def main():
 
     pic_dir = 'train_data/pics/'
     mask_dir = 'train_data/masks/'
+    
+    patchesDir = 'patches'
+    if not os.path.exists(patchesDir):
+        os.mkdir(patchesDir)
 
     all_patches = []
     all_labels = []
 
+    patch_num = 0
     for file_name in os.listdir(pic_dir):
         im = load_image(pic_dir + file_name)
         im = normalizeImage(im)
@@ -68,14 +81,14 @@ def main():
         mask_name = mask_dir + 'TM_' + file_name
         mask = (load_image(mask_name)*2).astype(int)
 
-        patches, labels = extractPatches(im, mask)
+        patches, labels, patch_num = extractPatches(im, mask, patch_num)
         if len(all_patches) == 0:
             all_patches = patches
             all_labels = labels
         else:
             all_patches = np.concatenate((all_patches, patches), axis=0)
             all_labels = np.concatenate((all_labels, labels), axis = 0)
-    
+
     
      
 
