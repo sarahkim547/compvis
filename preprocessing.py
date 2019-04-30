@@ -25,11 +25,27 @@ def normalizeImage(image):
     return (image.astype(float) - 128) / 128
 
 def extractPatches(im, mask):
-    patches = extract_patches_2d(im, (51,51)) 
+    # patches = extract_patches_2d(im, (51,51)) 
+    # pad = int((51 - 1)/2)
+    # h, w = mask.shape
+    # labels = mask[pad:h-pad, pad:w-pad]
+    # labels = labels.flatten()
+    # return patches, labels
+    wSz = 51
     pad = int((51 - 1)/2)
     h, w = mask.shape
+
     labels = mask[pad:h-pad, pad:w-pad]
     labels = labels.flatten()
+
+    patches = np.zeros((len(labels), wSz, wSz, 3))
+
+    count = 0
+    for i in range(pad, h - pad, 2):
+        for j in range(pad, w - pad, 2):
+            curr_patch = im[i-pad:i+pad+1, j-pad:j+pad+1, :]
+            patches[count] = curr_patch
+            count += 1
     return patches, labels
 
 
@@ -59,6 +75,7 @@ def main():
         else:
             all_patches = np.concatenate((all_patches, patches), axis=0)
             all_labels = np.concatenate((all_labels, labels), axis = 0)
+    
     
      
 
