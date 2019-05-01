@@ -16,34 +16,31 @@ def normalizeImage(image):
 
 
 def extractPatches(im, mask, patch_num):
-    patch_size = 51
-    pad = int((patch_size - 1) / 2)
+    assert im.shape[:2] == mask.shape
     h, w = mask.shape
 
-    labels = mask[pad:h-pad, pad:w-pad]
-    labels = labels.flatten()
-
+    patch_size = 51
+    pad = int((patch_size - 1) / 2)
+    num_patches = 0
     for i in range(pad, h - pad, 2):
         for j in range(pad, w - pad, 2):
             curr_patch = im[i-pad:i+pad+1, j-pad:j+pad+1, :]
-            np.save('patches/{:07d}'.format(patch_num), curr_patch)
-            patch_num += 1
+            np.save('patches/{:07d}'.format(patch_num + num_patches), curr_patch)
+            num_patches += 1
+
+    labels = mask[pad:h - pad:2, pad:w - pad:2]
+    labels = labels.flatten()
+    assert num_patches == len(labels)
 
     return labels
 
 
 def main():
-    # First we import a test image
-    # im = cv2.imread('Tissue images/TCGA-18-5592-01Z-00-DX1.tif', -1)
-    # im = normalizeImage(im)
-    # print(np.mean(im, axis=(0, 1)))
-
     pic_dir = 'train_data/pics/'
     mask_dir = 'train_data/masks/'
-    
-    patchesDir = 'patches'
-    if not os.path.exists(patchesDir):
-        os.mkdir(patchesDir)
+    patch_dir = 'patches/'
+    if not os.path.exists(patch_dir):
+        os.mkdir(patch_dir)
 
     all_labels = []
     patch_num = 0
