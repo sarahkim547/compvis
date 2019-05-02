@@ -1,6 +1,6 @@
 from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPool2D
 from keras.models import Sequential
-from keras.utils import Sequence
+from keras.utils import Sequence, to_categorical
 import numpy as np
 
 
@@ -57,6 +57,7 @@ def create_model():
 def main():
     model = create_model()
     labels = np.load('labels.npy')
+    labels = to_categorical(labels)
     training_batch_generator = DataGenerator(labels, BATCH_SIZE)
 
     model.fit_generator(generator=training_batch_generator,
