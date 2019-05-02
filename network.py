@@ -1,4 +1,4 @@
-from keras.layers import Conv2D, Dense, Dropout, MaxPool2D
+from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPool2D
 from keras.models import Sequential
 from keras.utils import Sequence
 import numpy as np
@@ -44,6 +44,7 @@ def create_model():
     model.add(Conv2D(filters=80, kernel_size=6, activation='relu'))
     model.add(Dropout(rate=0.25))
     model.add(MaxPool2D(pool_size=2))
+    model.add(Flatten())
     model.add(Dense(units=1024, activation='relu'))
     model.add(Dropout(rate=0.5))
     model.add(Dense(units=1024, activation='relu'))
