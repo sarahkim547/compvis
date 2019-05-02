@@ -16,7 +16,7 @@ class DataGenerator(Sequence):
         self.batch_size = batch_size
 
     def __len__(self):
-        return np.ceil(NUM_TRAINING_EXAMPLES / float(self.batch_size))
+        return int(np.ceil(NUM_TRAINING_EXAMPLES / float(self.batch_size)))
 
     def __getitem__(self, idx):
         start_idx = idx * self.batch_size
