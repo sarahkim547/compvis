@@ -8,7 +8,7 @@ BATCH_SIZE = 20
 NUM_EPOCHS = 1
 
 
-class DataGenerator():
+class DataGenerator(list):
 
     def __init__(self, labels, batch_size):
         self.labels = labels
