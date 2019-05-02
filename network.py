@@ -1,4 +1,4 @@
-from keras.layers import Conv2D, Dense, Dropout, Input, MaxPool2D
+from keras.layers import Conv2D, Dense, Dropout, MaxPool2D
 from keras.models import Sequential
 import numpy as np
 
@@ -34,8 +34,7 @@ class DataGenerator():
 
 def create_model():
     model = Sequential()
-    model.add(Input(batch_shape=(BATCH_SIZE, 51, 51, 3)))
-    model.add(Conv2D(filters=25, kernel_size=4, activation='relu'))
+    model.add(Conv2D(filters=25, kernel_size=4, activation='relu', input_shape=(51, 51, 3)))
     model.add(Dropout(rate=0.1))
     model.add(MaxPool2D(pool_size=2))
     model.add(Conv2D(filters=50, kernel_size=5, activation='relu'))
