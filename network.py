@@ -1,5 +1,6 @@
 from keras.layers import Conv2D, Dense, Dropout, MaxPool2D
 from keras.models import Sequential
+from keras.utils import Sequence
 import numpy as np
 
 
@@ -8,7 +9,7 @@ BATCH_SIZE = 20
 NUM_EPOCHS = 1
 
 
-class DataGenerator(list):
+class DataGenerator(Sequence):
 
     def __init__(self, labels, batch_size):
         self.labels = labels
