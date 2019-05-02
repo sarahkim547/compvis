@@ -19,6 +19,7 @@ model.add(Dropout(rate=0.5))
 model.add(Dense(units=1024, activation='relu'))
 model.add(Dropout(rate=0.5))
 model.add(Dense(units=3, activation='softmax'))
+model.compile(optimizer='adam', loss='categorical_crossentropy')
 
 NUM_TRAINING_EXAMPLES = 491220
 BATCH_SIZE = 20
