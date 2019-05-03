@@ -1,6 +1,7 @@
 """
 This file contains all of the functions for pre-processing the data
 """
+import argparse
 import numpy as np
 import os
 from skimage import io
@@ -36,9 +37,14 @@ def extractPatches(im, mask, patch_num):
 
 
 def main():
-    pic_dir = 'train_data/pics/'
-    mask_dir = 'train_data/masks/'
-    patch_dir = 'patches/'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data', choices=['train', 'test'], required=True, help='Process train or test dataset.')
+    args = parser.parse_args()
+
+    data_dir = 'train_data' if args.data == 'train' else 'test_data'
+    pic_dir = os.path.join(data_dir, 'pics')
+    mask_dir = os.path.join(data_dir, 'masks')
+    patch_dir = os.path.join(data_dir, 'patches')
     if not os.path.exists(patch_dir):
         os.mkdir(patch_dir)
 
@@ -46,10 +52,10 @@ def main():
     patch_num = 0
     for file_name in os.listdir(pic_dir):
         print('Processing image: {}'.format(file_name))
-        im = io.imread(pic_dir + file_name)
+        im = io.imread(os.path.join(pic_dir, file_name))
         im = normalizeImage(im)
 
-        mask_name = mask_dir + 'TM_' + file_name
+        mask_name = os.path.join(mask_dir, 'TM_' + file_name)
         mask = io.imread(mask_name) // 127
 
         labels = extractPatches(im, mask, patch_num)
@@ -57,7 +63,7 @@ def main():
         patch_num += len(labels)
 
     all_labels = np.concatenate(all_labels)
-    np.save('labels', all_labels)
+    np.save(os.path.join(data_dir, 'labels'), all_labels)
 
 
 if __name__ == '__main__':
