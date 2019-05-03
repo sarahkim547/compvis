@@ -2,21 +2,24 @@ from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPool2D
 from keras.models import Sequential
 from keras.utils import Sequence, to_categorical
 import numpy as np
+import os
 
 
-NUM_TRAINING_EXAMPLES = 491220
+NUM_TRAIN_EXAMPLES = 491220
+NUM_TEST_EXAMPLES = 517361
 BATCH_SIZE = 20
 NUM_EPOCHS = 1
 
 
 class DataGenerator(Sequence):
 
-    def __init__(self, labels, batch_size):
+    def __init__(self, patch_dir, labels, batch_size):
+        self.patch_dir = patch_dir
         self.labels = labels
         self.batch_size = batch_size
 
     def __len__(self):
-        return int(np.ceil(NUM_TRAINING_EXAMPLES / float(self.batch_size)))
+        return int(np.ceil(NUM_TRAIN_EXAMPLES / float(self.batch_size)))
 
     def __getitem__(self, idx):
         start_idx = idx * self.batch_size
@@ -24,8 +27,9 @@ class DataGenerator(Sequence):
 
         batch_x = []
         for i in range(start_idx, end_idx):
-            if i < NUM_TRAINING_EXAMPLES:
-                batch_x.append(np.load('patches/{:07d}.npy'.format(i)))
+            if i < NUM_TRAIN_EXAMPLES:
+                patch_file = os.path.join(self.patch_dir, '{:07d}.npy'.format(i))
+                batch_x.append(np.load(patch_file))
 
         batch_x = np.stack(batch_x)
         batch_y = self.labels[start_idx:end_idx]
@@ -56,16 +60,17 @@ def create_model():
 
 def main():
     model = create_model()
-    labels = np.load('labels.npy')
-    labels = to_categorical(labels)
-    training_batch_generator = DataGenerator(labels, BATCH_SIZE)
+    train_labels = to_categorical(np.load('train_data/labels.npy'))
+    test_labels = to_categorical(np.load('test_data/labels.npy'))
+    train_batch_generator = DataGenerator('train_data/patches', train_labels, BATCH_SIZE)
+    test_batch_generator = DataGenerator('test_data/patches', test_labels, BATCH_SIZE)
 
-    model.fit_generator(generator=training_batch_generator,
-                        steps_per_epoch=(NUM_TRAINING_EXAMPLES // BATCH_SIZE),
+    model.fit_generator(generator=train_batch_generator,
+                        steps_per_epoch=(NUM_TRAIN_EXAMPLES // BATCH_SIZE),
                         epochs=NUM_EPOCHS,
                         verbose=1,
-                        # validation_data=my_validation_batch_generator,
-                        # validation_steps=(num_validation_samples // batch_size),
+                        validation_data=test_batch_generator,
+                        validation_steps=(NUM_TEST_EXAMPLES // BATCH_SIZE),
                         use_multiprocessing=True,
                         workers=16)
 
