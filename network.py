@@ -67,8 +67,8 @@ def main():
     args = parser.parse_args()
     if args.num_train < 0 or args.num_test < 0:
         raise ValueError('num_train and num_test must be nonnegative integers.')
-    num_train = min(args.num_train, NUM_TRAIN_EXAMPLES)
-    num_test = min(args.num_test, NUM_TEST_EXAMPLES)
+    num_train = NUM_TRAIN_EXAMPLES if args.num_train == 0 else min(args.num_train, NUM_TRAIN_EXAMPLES)
+    num_test = NUM_TEST_EXAMPLES if args.num_test == 0 else min(args.num_test, NUM_TEST_EXAMPLES)
 
     model = create_model()
     train_labels = to_categorical(np.load(os.path.join('train_data', 'labels.npy')))
