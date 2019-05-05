@@ -12,7 +12,6 @@ from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_
 NUM_TRAIN_EXAMPLES = 491220
 NUM_TEST_EXAMPLES = 517361
 BATCH_SIZE = 20
-NUM_EPOCHS = 1
 DECAY_EPOCHS = 5
 
 
@@ -94,9 +93,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_train', type=int, default=0, help='Number of examples to train on (0 = all examples).')
     parser.add_argument('--num_test', type=int, default=0, help='Number of examples to test on (0 = all examples).')
+    parser.add_argument('--epochs', type=int, default=100, help='Number of epochs.')
     args = parser.parse_args()
     if args.num_train < 0 or args.num_test < 0:
         raise ValueError('num_train and num_test must be nonnegative integers.')
+    if args.epochs < 1:
+        raise ValueError('Epochs must be a positive integer.')
     num_train = NUM_TRAIN_EXAMPLES if args.num_train == 0 else min(args.num_train, NUM_TRAIN_EXAMPLES)
     num_test = NUM_TEST_EXAMPLES if args.num_test == 0 else min(args.num_test, NUM_TEST_EXAMPLES)
 
