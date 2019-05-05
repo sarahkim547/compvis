@@ -112,7 +112,7 @@ def main():
 
     model.fit_generator(generator=train_batch_generator,
                         steps_per_epoch=(num_train // BATCH_SIZE),
-                        epochs=NUM_EPOCHS,
+                        epochs=args.epochs,
                         shuffle=True,
                         verbose=1,
                         validation_data=test_batch_generator,
