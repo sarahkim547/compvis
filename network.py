@@ -93,7 +93,7 @@ def main():
                         verbose=1,
                         validation_data=test_batch_generator,
                         callbacks=[lr_schedule],
-                        class_weight={0: 1.0, 1: 18.9, 2: 11.5},
+                        class_weight={0: 1.0, 1: 1.6, 2: 1.0},
                         use_multiprocessing=True,
                         workers=8)
 
