@@ -11,8 +11,8 @@ import os
 NUM_TRAIN_EXAMPLES = 491220
 NUM_TEST_EXAMPLES = 517361
 BATCH_SIZE = 20
-LEARNING_RATE = 0.1
-DECAY_EPOCHS = 5
+LEARNING_RATE = 0.01
+DECAY_EPOCHS = 10
 
 
 class DataGenerator(Sequence):
@@ -45,19 +45,19 @@ class DataGenerator(Sequence):
 def create_model():
     model = Sequential()
     model.add(Conv2D(filters=25, kernel_size=4, activation='relu', input_shape=(51, 51, 3)))
-    model.add(Dropout(rate=0.1))
+    # model.add(Dropout(rate=0.1))
     model.add(MaxPool2D(pool_size=2))
     model.add(Conv2D(filters=50, kernel_size=5, activation='relu'))
-    model.add(Dropout(rate=0.2))
+    # model.add(Dropout(rate=0.2))
     model.add(MaxPool2D(pool_size=2))
     model.add(Conv2D(filters=80, kernel_size=6, activation='relu'))
-    model.add(Dropout(rate=0.25))
+    # model.add(Dropout(rate=0.25))
     model.add(MaxPool2D(pool_size=2))
     model.add(Flatten())
     model.add(Dense(units=1024, activation='relu'))
-    model.add(Dropout(rate=0.5))
+    # model.add(Dropout(rate=0.5))
     model.add(Dense(units=1024, activation='relu'))
-    model.add(Dropout(rate=0.5))
+    # model.add(Dropout(rate=0.5))
     model.add(Dense(units=3, activation='softmax'))
     model.compile(optimizer=Adam(lr=LEARNING_RATE), loss='categorical_crossentropy', metrics=['accuracy'])
 
@@ -93,10 +93,11 @@ def main():
                         shuffle=True,
                         verbose=1,
                         validation_data=test_batch_generator,
-                        callbacks=[lr_schedule],
-                        class_weight={0: 1.0, 1: 1.6, 2: 1.0},
-                        use_multiprocessing=True,
-                        workers=8)
+                        # callbacks=[lr_schedule],
+                        # class_weight={0: 1.0, 1: 1.6, 2: 1.0},
+                        # use_multiprocessing=True,
+                        # workers=8,
+                        )
 
     model_folder = 'models'
     if not os.path.exists(model_folder):
