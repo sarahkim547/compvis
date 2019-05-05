@@ -21,18 +21,18 @@ def normalizeImage(image):
     return (image.astype(np.float32) - 128) / 128
 
 
-def extractPatches(im, patch_num, sample_num, patch_dir, sample=None):
+def extractPatches(im, patch_global_num, patch_sample_num, patch_dir, sample=None):
     h, w = im.shape[0], im.shape[1]
     for i in range(PAD, h - PAD, 2):
         for j in range(PAD, w - PAD, 2):
-            if sample is None or patch_num in sample:
+            if sample is None or patch_global_num in sample:
                 curr_patch = im[i-PAD:i+PAD+1, j-PAD:j+PAD+1, :]
-                patch_file = os.path.join(patch_dir, '{:07d}'.format(sample_num))
+                patch_file = os.path.join(patch_dir, '{:07d}'.format(patch_sample_num))
                 np.save(patch_file, curr_patch)
-                sample_num += 1
-            patch_num += 1
+                patch_sample_num += 1
+            patch_global_num += 1
 
-    return patch_num, sample_num
+    return patch_global_num, patch_sample_num
 
 
 def getLabels(mask):
@@ -88,12 +88,12 @@ def main():
         np.save(os.path.join(data_dir, 'labels'), sampled_labels)
         sample = set(sample)
 
-    patch_num, sample_num = 0, 0
+    patch_global_num, patch_sample_num = 0, 0
     for pic_file in sorted(os.listdir(pic_dir)):
         print('Processing image: {}'.format(pic_file))
         im = io.imread(os.path.join(pic_dir, pic_file))
         im = normalizeImage(im)
-        patch_num, sample_num = extractPatches(im, patch_num, sample_num, patch_dir, sample)
+        patch_global_num, patch_sample_num = extractPatches(im, patch_global_num, patch_sample_num, patch_dir, sample)
 
 
 if __name__ == '__main__':
