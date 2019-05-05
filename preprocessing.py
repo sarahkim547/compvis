@@ -45,10 +45,11 @@ def getLabels(mask):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data', choices=['train', 'test'], required=True, help='Process train or test dataset.')
-    parser.add_argument('--num', type=int, default=0, help='Number of examples to process (0 = all examples).')
+    parser.add_argument('--num', type=int, default=None, help='Number of examples to process, sampled uniformly.')
+    parser.add_argument('--num0', type=int, default=None, help='Number of examples of class 0 to process.')
+    parser.add_argument('--num1', type=int, default=None, help='Number of examples of class 1 to process.')
+    parser.add_argument('--num2', type=int, default=None, help='Number of examples of class 2 to process.')
     args = parser.parse_args()
-    if args.num < 0:
-        raise ValueError('Num must be a nonnegative integer.')
 
     data_dir = 'train_data' if args.data == 'train' else 'test_data'
     pic_dir = os.path.join(data_dir, 'pics')
@@ -65,13 +66,23 @@ def main():
         mask = io.imread(os.path.join(mask_dir, mask_file))
         labels = getLabels(mask)
         all_labels.append(labels)
-
     all_labels = np.concatenate(all_labels)
-    if args.num == 0 or args.num > len(all_labels):
+
+    if args.num is None and args.num0 is None:
         np.save(os.path.join(data_dir, 'labels'), all_labels)
         sample = None
-    else:
+    elif args.num is not None:
         sample = random.sample(range(len(all_labels)), args.num)
+        sample.sort()
+        sampled_labels = all_labels[sample]
+        np.save(os.path.join(data_dir, 'labels'), sampled_labels)
+        sample = set(sample)
+    else:
+        sample = []
+        for label, num in [(0, args.num0), (1, args.num1), (2, args.num2)]:
+            indices = np.argwhere(all_labels == label).flatten()
+            sample.append(random.sample(indices, num))
+        sample = np.concatenate(sample)
         sample.sort()
         sampled_labels = all_labels[sample]
         np.save(os.path.join(data_dir, 'labels'), sampled_labels)
