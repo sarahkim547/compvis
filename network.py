@@ -59,7 +59,7 @@ def create_model():
     model.add(Dense(units=1024, activation='relu'))
     model.add(Dropout(rate=0.5))
     model.add(Dense(units=3, activation='softmax'))
-    model.compile(optimizer=Adam(lr=0.01), loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=Adam(lr=LEARNING_RATE), loss='categorical_crossentropy', metrics=['accuracy'])
 
     def step_decay(epoch, lr):
         if epoch != 0 and epoch % DECAY_EPOCHS == 0:
