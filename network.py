@@ -12,7 +12,7 @@ NUM_TRAIN_EXAMPLES = 491220
 NUM_TEST_EXAMPLES = 517361
 BATCH_SIZE = 20
 LEARNING_RATE = 1e-4
-DECAY_EPOCHS = 10
+DECAY_EPOCHS = 20
 
 
 class DataGenerator(Sequence):
@@ -64,7 +64,7 @@ def create_model():
     model.reset_states()
 
     def step_decay(epoch, lr):
-        if epoch != 0 and epoch % DECAY_EPOCHS == 0:
+        if (epoch + 1) % DECAY_EPOCHS == 0:
             return lr / 2
         return lr
 
@@ -97,7 +97,7 @@ def main():
                         shuffle=True,
                         verbose=1,
                         validation_data=test_batch_generator,
-                        # callbacks=[lr_schedule],
+                        callbacks=[lr_schedule],
                         class_weight={0: 1.0, 1: 1.6, 2: 1.0},
                         use_multiprocessing=True,
                         workers=8,
