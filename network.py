@@ -1,3 +1,4 @@
+import argparse
 from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPool2D
 from keras.models import Sequential
 from keras.utils import Sequence, to_categorical
@@ -13,10 +14,11 @@ NUM_EPOCHS = 1
 
 class DataGenerator(Sequence):
 
-    def __init__(self, patch_dir, labels, batch_size):
+    def __init__(self, patch_dir, labels, batch_size, max_num_examples):
         self.patch_dir = patch_dir
         self.labels = labels
         self.batch_size = batch_size
+        self.max_num_examples = max_num_examples
 
     def __len__(self):
         return int(np.ceil(NUM_TRAIN_EXAMPLES / float(self.batch_size)))
@@ -27,7 +29,7 @@ class DataGenerator(Sequence):
 
         batch_x = []
         for i in range(start_idx, end_idx):
-            if i < NUM_TRAIN_EXAMPLES:
+            if i < self.max_num_examples:
                 patch_file = os.path.join(self.patch_dir, '{:07d}.npy'.format(i))
                 batch_x.append(np.load(patch_file))
 
@@ -59,18 +61,29 @@ def create_model():
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--num_train', type=int, default=0, help='Number of examples to train on (0 = all examples).')
+    parser.add_argument('--num_test', type=int, default=0, help='Number of examples to test on (0 = all examples).')
+    args = parser.parse_args()
+    if args.num_train < 0 or args.num_test < 0:
+        raise ValueError('num_train and num_test must be nonnegative integers.')
+    num_train = min(args.num_train, NUM_TRAIN_EXAMPLES)
+    num_test = min(args.num_test, NUM_TEST_EXAMPLES)
+
     model = create_model()
-    train_labels = to_categorical(np.load('train_data/labels.npy'))
-    test_labels = to_categorical(np.load('test_data/labels.npy'))
-    train_batch_generator = DataGenerator('train_data/patches', train_labels, BATCH_SIZE)
-    test_batch_generator = DataGenerator('test_data/patches', test_labels, BATCH_SIZE)
+    train_labels = to_categorical(np.load(os.path.join('train_data', 'labels.npy')))
+    test_labels = to_categorical(np.load(os.path.join('test_data', 'labels.npy')))
+    train_batch_generator = DataGenerator(os.path.join('train_data', 'patches'),
+                                          train_labels, BATCH_SIZE, NUM_TRAIN_EXAMPLES)
+    test_batch_generator = DataGenerator(os.path.join('test_data', 'patches'),
+                                         test_labels, BATCH_SIZE, NUM_TEST_EXAMPLES)
 
     model.fit_generator(generator=train_batch_generator,
-                        steps_per_epoch=(NUM_TRAIN_EXAMPLES // BATCH_SIZE),
+                        steps_per_epoch=(num_train // BATCH_SIZE),
                         epochs=NUM_EPOCHS,
                         verbose=1,
                         validation_data=test_batch_generator,
-                        validation_steps=(NUM_TEST_EXAMPLES // BATCH_SIZE),
+                        validation_steps=(num_test // BATCH_SIZE),
                         use_multiprocessing=True,
                         workers=16)
 
