@@ -56,7 +56,7 @@ def create_model():
     model.add(Dense(units=1024, activation='relu'))
     model.add(Dropout(rate=0.5))
     model.add(Dense(units=3, activation='softmax'))
-    model.compile(optimizer='adam', loss='categorical_crossentropy')
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     return model
 
 
@@ -81,6 +81,7 @@ def main():
     model.fit_generator(generator=train_batch_generator,
                         steps_per_epoch=(num_train // BATCH_SIZE),
                         epochs=NUM_EPOCHS,
+                        shuffle=True,
                         verbose=1,
                         validation_data=test_batch_generator,
                         validation_steps=(num_test // BATCH_SIZE),
