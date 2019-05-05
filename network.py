@@ -35,7 +35,6 @@ class DataGenerator(Sequence):
             if i < self.num_examples:
                 patch_file = os.path.join(self.patch_dir, '{:07d}.npy'.format(i))
                 patch = np.load(patch_file)
-                print(np.min(patch), np.max(patch))
                 batch_x.append(patch)
 
         batch_x = np.stack(batch_x)
@@ -76,6 +75,7 @@ def main():
     parser.add_argument('--num_train', type=int, required=True, help='Number of training examples.')
     parser.add_argument('--num_test', type=int, required=True, help='Number of testing examples.')
     parser.add_argument('--epochs', type=int, default=100, help='Number of epochs.')
+    parser.add_argument('--train_dir', default='train_data')
     args = parser.parse_args()
     if args.num_train < 1 or args.num_test < 1:
         raise ValueError('num_train and num_test must be positive integers.')
@@ -83,9 +83,9 @@ def main():
         raise ValueError('Epochs must be a positive integer.')
 
     model, lr_schedule = create_model()
-    train_labels = to_categorical(np.load(os.path.join('train_data', 'labels.npy')))
+    train_labels = to_categorical(np.load(os.path.join(args.train_dir, 'labels.npy')))
     test_labels = to_categorical(np.load(os.path.join('test_data', 'labels.npy')))
-    train_batch_generator = DataGenerator(os.path.join('train_data', 'patches'),
+    train_batch_generator = DataGenerator(os.path.join(args.train_dir, 'patches'),
                                           train_labels, args.num_train, BATCH_SIZE)
     test_batch_generator = DataGenerator(os.path.join('test_data', 'patches'),
                                          test_labels, args.num_test, BATCH_SIZE)
