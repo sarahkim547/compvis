@@ -116,6 +116,7 @@ def main():
                         validation_data=test_batch_generator,
                         validation_steps=(num_test // BATCH_SIZE),
                         callbacks=[lr_schedule, Eval()],
+                        class_weight={0: 1.0, 1: 18.9, 2: 11.5},
                         use_multiprocessing=True,
                         workers=16)
 
