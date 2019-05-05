@@ -80,7 +80,7 @@ def main():
     else:
         sample = []
         for label, num in [(0, args.num0), (1, args.num1), (2, args.num2)]:
-            indices = np.argwhere(all_labels == label).flatten()
+            indices = list(np.argwhere(all_labels == label).flatten())
             sample.append(random.sample(indices, num))
         sample = np.concatenate(sample)
         sample.sort()
