@@ -97,5 +97,10 @@ def main():
                         use_multiprocessing=True,
                         workers=8)
 
+    model_folder = 'models'
+    if not os.path.exists(model_folder):
+        os.mkdir(model_folder)
+    model.save(os.path.join(model_folder, 'model.h5'))
+
 if __name__ == '__main__':
     main()
