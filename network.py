@@ -1,6 +1,8 @@
 import argparse
+from keras.callbacks import LearningRateScheduler
 from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPool2D
 from keras.models import Sequential
+from keras.optimizers import Adam
 from keras.utils import Sequence, to_categorical
 import numpy as np
 import os
@@ -10,6 +12,7 @@ NUM_TRAIN_EXAMPLES = 491220
 NUM_TEST_EXAMPLES = 517361
 BATCH_SIZE = 20
 NUM_EPOCHS = 1
+DECAY_EPOCHS = 5
 
 
 class DataGenerator(Sequence):
@@ -56,8 +59,14 @@ def create_model():
     model.add(Dense(units=1024, activation='relu'))
     model.add(Dropout(rate=0.5))
     model.add(Dense(units=3, activation='softmax'))
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    return model
+    model.compile(optimizer=Adam(lr=0.01), loss='categorical_crossentropy', metrics=['accuracy'])
+
+    def step_decay(epoch, lr):
+        if epoch != 0 and epoch % DECAY_EPOCHS == 0:
+            return lr / 2
+        return lr
+
+    return model, LearningRateScheduler(step_decay)
 
 
 def main():
@@ -70,7 +79,7 @@ def main():
     num_train = NUM_TRAIN_EXAMPLES if args.num_train == 0 else min(args.num_train, NUM_TRAIN_EXAMPLES)
     num_test = NUM_TEST_EXAMPLES if args.num_test == 0 else min(args.num_test, NUM_TEST_EXAMPLES)
 
-    model = create_model()
+    model, lr_schedule = create_model()
     train_labels = to_categorical(np.load(os.path.join('train_data', 'labels.npy')))
     test_labels = to_categorical(np.load(os.path.join('test_data', 'labels.npy')))
     train_batch_generator = DataGenerator(os.path.join('train_data', 'patches'),
@@ -85,6 +94,7 @@ def main():
                         verbose=1,
                         validation_data=test_batch_generator,
                         validation_steps=(num_test // BATCH_SIZE),
+                        callbacks=[lr_schedule],
                         use_multiprocessing=True,
                         workers=16)
 
