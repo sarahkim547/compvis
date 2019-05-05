@@ -34,8 +34,9 @@ class DataGenerator(Sequence):
         for i in range(start_idx, end_idx):
             if i < self.num_examples:
                 patch_file = os.path.join(self.patch_dir, '{:07d}.npy'.format(i))
-                print(np.min(patch_file), np.max(patch_file))
-                batch_x.append(np.load(patch_file))
+                patch = np.load(patch_file)
+                print(np.min(patch), np.max(patch))
+                batch_x.append(patch)
 
         batch_x = np.stack(batch_x)
         batch_y = self.labels[start_idx:end_idx]
