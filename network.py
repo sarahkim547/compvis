@@ -61,6 +61,7 @@ def create_model():
     # model.add(Dropout(rate=0.5))
     model.add(Dense(units=2, activation='softmax'))
     model.compile(optimizer=Adam(lr=LEARNING_RATE), loss='binary_crossentropy', metrics=['accuracy'])
+    model.reset_states()
 
     def step_decay(epoch, lr):
         if epoch != 0 and epoch % DECAY_EPOCHS == 0:
