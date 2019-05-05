@@ -59,8 +59,8 @@ def create_model():
     # model.add(Dropout(rate=0.5))
     model.add(Dense(units=1024, activation='relu'))
     # model.add(Dropout(rate=0.5))
-    model.add(Dense(units=2, activation='softmax'))
-    model.compile(optimizer=Adam(lr=LEARNING_RATE), loss='binary_crossentropy', metrics=['accuracy'])
+    model.add(Dense(units=3, activation='softmax'))
+    model.compile(optimizer=Adam(lr=LEARNING_RATE), loss='categorical_crossentropy', metrics=['accuracy'])
     model.reset_states()
 
     def step_decay(epoch, lr):
@@ -85,8 +85,8 @@ def main():
         raise ValueError('Epochs must be a positive integer.')
 
     model, lr_schedule = create_model()
-    train_labels = to_categorical(np.load(os.path.join(args.train_dir, 'labels.npy')), num_classes=2)
-    test_labels = to_categorical(np.load(os.path.join(args.test_dir, 'labels.npy')), num_classes=2)
+    train_labels = to_categorical(np.load(os.path.join(args.train_dir, 'labels.npy')), num_classes=3)
+    test_labels = to_categorical(np.load(os.path.join(args.test_dir, 'labels.npy')), num_classes=3)
     train_batch_generator = DataGenerator(os.path.join(args.train_dir, 'patches'),
                                           train_labels, args.num_train, BATCH_SIZE)
     test_batch_generator = DataGenerator(os.path.join(args.test_dir, 'patches'),
