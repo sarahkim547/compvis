@@ -76,6 +76,7 @@ def main():
     parser.add_argument('--num_test', type=int, required=True, help='Number of testing examples.')
     parser.add_argument('--epochs', type=int, default=100, help='Number of epochs.')
     parser.add_argument('--train_dir', default='train_data')
+    parser.add_argument('--test_dir', default='test_data')
     args = parser.parse_args()
     if args.num_train < 1 or args.num_test < 1:
         raise ValueError('num_train and num_test must be positive integers.')
@@ -84,10 +85,10 @@ def main():
 
     model, lr_schedule = create_model()
     train_labels = to_categorical(np.load(os.path.join(args.train_dir, 'labels.npy')))
-    test_labels = to_categorical(np.load(os.path.join('test_data', 'labels.npy')))
+    test_labels = to_categorical(np.load(os.path.join(args.test_dir, 'labels.npy')))
     train_batch_generator = DataGenerator(os.path.join(args.train_dir, 'patches'),
                                           train_labels, args.num_train, BATCH_SIZE)
-    test_batch_generator = DataGenerator(os.path.join('test_data', 'patches'),
+    test_batch_generator = DataGenerator(os.path.join(args.test_dir, 'patches'),
                                          test_labels, args.num_test, BATCH_SIZE)
 
     model.fit_generator(generator=train_batch_generator,
