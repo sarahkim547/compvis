@@ -1,11 +1,12 @@
 import argparse
-from keras.callbacks import LearningRateScheduler
+from keras.callbacks import Callback, LearningRateScheduler
 from keras.layers import Conv2D, Dense, Dropout, Flatten, MaxPool2D
 from keras.models import Sequential
 from keras.optimizers import Adam
 from keras.utils import Sequence, to_categorical
 import numpy as np
 import os
+from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
 
 
 NUM_TRAIN_EXAMPLES = 491220
@@ -40,6 +41,26 @@ class DataGenerator(Sequence):
         batch_y = self.labels[start_idx:end_idx]
 
         return batch_x, batch_y
+
+
+class Eval(Callback):
+
+    def on_train_begin(self, logs={}):
+        self.val_f1s = []
+        self.val_recalls = []
+        self.val_precisions = []
+
+    def on_epoch_end(self, epoch, logs={}):
+        val_predict = (np.asarray(self.model.predict(self.model.validation_data[0]))).round()
+        val_targ = self.model.validation_data[1]
+        _val_f1 = f1_score(val_targ, val_predict)
+        _val_recall = recall_score(val_targ, val_predict)
+        _val_precision = precision_score(val_targ, val_predict)
+        self.val_f1s.append(_val_f1)
+        self.val_recalls.append(_val_recall)
+        self.val_precisions.append(_val_precision)
+        print(' — val_f1: % f — val_precision: % f — val_recall % f' % (_val_f1, _val_precision, _val_recall))
+        return
 
 
 def create_model():
@@ -94,7 +115,7 @@ def main():
                         verbose=1,
                         validation_data=test_batch_generator,
                         validation_steps=(num_test // BATCH_SIZE),
-                        callbacks=[lr_schedule],
+                        callbacks=[lr_schedule, Eval()],
                         use_multiprocessing=True,
                         workers=16)
 
