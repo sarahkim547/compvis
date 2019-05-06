@@ -33,8 +33,8 @@ def main():
                 indices.append((i, j))
                 if len(patches) == 32:
                     preds = model.predict_proba(np.stack(patches))
-                    for (i, j), pred in zip(indices, preds):
-                        pred_ar[i, j, :] = pred
+                    for (ii, jj), pred in zip(indices, preds):
+                        pred_ar[ii, jj, :] = pred
                     patches, indices = [], []
         if len(patches) > 0:
             preds = model.predict_proba(np.stack(patches))
