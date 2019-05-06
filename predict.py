@@ -25,11 +25,20 @@ def main():
         im = normalizeImage(im)
         h, w = im.shape[:2]
         pred_ar = np.zeros((h, w, 3), dtype=np.float32)
+        patches, indices = [], []
         for i in range(PAD, h - PAD):
             for j in range(PAD, w - PAD):
                 patch = im[i-PAD:i+PAD+1, j-PAD:j+PAD+1, :]
-                patch = patch.reshape((1, PATCH_SIZE, PATCH_SIZE, 3))
-                pred = model.predict_proba(patch).flatten()
+                patches.append(patch)
+                indices.append((i, j))
+                if len(patches) == 32:
+                    preds = model.predict_proba(np.stack(patches))
+                    for (i, j), pred in zip(indices, preds):
+                        pred_ar[i, j, :] = pred
+                    patches, indices = [], []
+        if len(patches) > 0:
+            preds = model.predict_proba(np.stack(patches))
+            for (i, j), pred in zip(indices, preds):
                 pred_ar[i, j, :] = pred
 
         pic_name, _ = os.path.splitext(pic_file)
