@@ -3,7 +3,7 @@ import numpy as np
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('ar', nargs=1, required=True)
+parser.add_argument('ar', nargs=1)
 args = parser.parse_args()
 
 ar = np.load(args.ar)
