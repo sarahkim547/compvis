@@ -54,17 +54,16 @@ def getLabels(mask):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', choices=['train', 'test'], required=True, help='Process train or test dataset.')
+    parser.add_argument('--data_dir', required=True, help='Directory to find data.')
     parser.add_argument('--num', type=int, default=None, help='Number of examples to process, sampled uniformly.')
     parser.add_argument('--num0', type=int, default=None, help='Number of examples of class 0 to process.')
     parser.add_argument('--num1', type=int, default=None, help='Number of examples of class 1 to process.')
     parser.add_argument('--num2', type=int, default=None, help='Number of examples of class 2 to process.')
     args = parser.parse_args()
 
-    data_dir = 'train_data' if args.data == 'train' else 'test_data'
-    pic_dir = os.path.join(data_dir, 'pics')
-    mask_dir = os.path.join(data_dir, 'masks')
-    patch_dir = os.path.join(data_dir, 'patches')
+    pic_dir = os.path.join(args.data_dir, 'pics')
+    mask_dir = os.path.join(args.data_dir, 'masks')
+    patch_dir = os.path.join(args.data_dir, 'patches')
     if not os.path.exists(patch_dir):
         os.mkdir(patch_dir)
 
@@ -83,7 +82,7 @@ def main():
         sample = random.sample(range(len(all_labels)), args.num)
         sample.sort()
         sampled_labels = all_labels[sample]
-        np.save(os.path.join(data_dir, 'labels'), sampled_labels)
+        np.save(os.path.join(args.data_dir, 'labels'), sampled_labels)
         sample = set(sample)
     else:
         sample = []
@@ -93,9 +92,9 @@ def main():
         sample = np.concatenate(sample)
         sample.sort()
         sampled_labels = all_labels[sample]
-        np.save(os.path.join(data_dir, 'labels'), sampled_labels)
+        np.save(os.path.join(args.data_dir, 'labels'), sampled_labels)
         sample = set(sample)
-    np.save(os.path.join(data_dir, 'labels'), sampled_labels)
+    np.save(os.path.join(args.data_dir, 'labels'), sampled_labels)
 
     patch_global_num, patch_sample_num = 0, 0
     for pic_file in sorted(os.listdir(pic_dir)):
