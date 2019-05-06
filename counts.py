@@ -7,4 +7,8 @@ parser.add_argument('ar', nargs=1)
 args = parser.parse_args()
 
 ar = np.load(args.ar[0])
-print(dict(zip(*np.unique(ar, return_counts=True))))
+counts = dict(zip(*np.unique(ar, return_counts=True)))
+print(counts)
+s = sum(counts.values())
+fracs = {i: c/s for i, c in counts.items()}
+print(fracs)
