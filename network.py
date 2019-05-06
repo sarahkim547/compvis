@@ -78,6 +78,7 @@ def main():
     parser.add_argument('--epochs', type=int, default=100, help='Number of epochs.')
     parser.add_argument('--train_dir', default='train_data')
     parser.add_argument('--test_dir', default='test_data')
+    parser.add_argument('--save', default='model.h5')
     args = parser.parse_args()
     if args.num_train < 1 or args.num_test < 1:
         raise ValueError('num_train and num_test must be positive integers.')
@@ -106,7 +107,11 @@ def main():
     model_folder = 'models'
     if not os.path.exists(model_folder):
         os.mkdir(model_folder)
-    model.save(os.path.join(model_folder, 'model.h5'))
+    model_file = args.save if args.save.endswith('.h5') else args.save + '.h5'
+    model_path = os.path.join(model_folder, model_file)
+    model.save(model_path)
+    print('Model saved: {}'.format(model_path))
+
 
 if __name__ == '__main__':
     main()
